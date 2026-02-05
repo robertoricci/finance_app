@@ -252,6 +252,435 @@ def mostrar_visao_mensal(usuario, formatador):
     
     st.divider()
     
+    # ===== KPIs PROFISSIONAIS =====
+    st.subheader("📊 Indicadores Financeiros Profissionais")
+    
+    # Obtém lançamentos do mês para cálculos
+    lancamentos = LancamentoService.listar_lancamentos(usuario.id, mes, ano)
+    
+    if lancamentos:
+        # Prepara dados
+        entradas_mes = [l for l in lancamentos if l['categoria_tipo'] == TipoCategoria.ENTRADA]
+        despesas_mes = [l for l in lancamentos if l['categoria_tipo'] == TipoCategoria.DESPESA]
+        
+        total_entradas_mes = sum(l['valor'] for l in entradas_mes)
+        total_despesas_mes = sum(l['valor'] for l in despesas_mes)
+        
+        # ===== KPI 1: Distribuição de Despesas por Categoria =====
+        st.markdown("#### 🎯 KPI 1: Distribuição de Despesas por Categoria")
+        
+        if despesas_mes:
+            # Agrupa despesas por categoria
+            despesas_por_categoria = {}
+            for lanc in despesas_mes:
+                cat = lanc['categoria_nome']
+                if cat not in despesas_por_categoria:
+                    despesas_por_categoria[cat] = {'valor': 0, 'cor': lanc['categoria_cor']}
+                despesas_por_categoria[cat]['valor'] += lanc['valor']
+            
+            # Calcula percentuais
+            df_dist = pd.DataFrame([
+                {
+                    'categoria': cat,
+                    'valor': dados['valor'],
+                    'percentual': (dados['valor'] / total_despesas_mes * 100),
+                    'cor': dados['cor']
+                }
+                for cat, dados in despesas_por_categoria.items()
+            ]).sort_values('valor', ascending=False)
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                # Gráfico de Donut
+                fig_donut = go.Figure(data=[go.Pie(
+                    labels=df_dist['categoria'],
+                    values=df_dist['valor'],
+                    hole=0.5,
+                    marker=dict(colors=df_dist['cor']),
+                    texttemplate='%{label}<br>%{percent}',
+                    hovertemplate='<b>%{label}</b><br>Valor: R$ %{value:,.2f}<br>Percentual: %{percent}<extra></extra>'
+                )])
+                
+                fig_donut.update_layout(
+                    title="Distribuição Percentual",
+                    height=400,
+                    annotations=[dict(
+                        text=formatador.formatar_moeda(total_despesas_mes),
+                        x=0.5, y=0.5,
+                        font_size=16,
+                        showarrow=False
+                    )]
+                )
+                
+                st.plotly_chart(fig_donut, use_container_width=True)
+            
+            with col2:
+                st.markdown("**Interpretação:**")
+                
+                # Mostra top 3 categorias
+                for idx, row in df_dist.head(3).iterrows():
+                    st.markdown(f"""
+                    **{idx+1}. {row['categoria']}**
+                    - Valor: {formatador.formatar_moeda(row['valor'])}
+                    - {row['percentual']:.1f}% do total
+                    """)
+                
+                # Alerta se alguma categoria > 40%
+                cat_alta = df_dist[df_dist['percentual'] > 40]
+                if not cat_alta.empty:
+                    st.warning(f"⚠️ **{cat_alta.iloc[0]['categoria']}** representa mais de 40% dos gastos!")
+        else:
+            st.info("Nenhuma despesa registrada neste período.")
+        
+        st.divider()
+        
+        # ===== KPI 2: Evolução Mensal de Gastos (Últimos 6 meses) =====
+        st.markdown("#### 📈 KPI 2: Evolução Mensal de Gastos")
+        
+        # Calcula gastos dos últimos 6 meses
+        evolucao_gastos = []
+        data_atual = date(ano, mes, 1)
+        
+        for i in range(5, -1, -1):
+            data_mes = data_atual - relativedelta(months=i)
+            mes_num = data_mes.month
+            ano_num = data_mes.year
+            
+            totais_mes = LancamentoService.calcular_totais(usuario.id, mes_num, ano_num)
+            
+            evolucao_gastos.append({
+                'mes': formatador.mes_ano_formatado(mes_num, ano_num).split(' de ')[0][:3],
+                'mes_completo': formatador.mes_ano_formatado(mes_num, ano_num),
+                'gastos': totais_mes['total_despesas']
+            })
+        
+        df_evolucao = pd.DataFrame(evolucao_gastos)
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            # Gráfico de Linha
+            fig_evolucao_gastos = go.Figure()
+            
+            fig_evolucao_gastos.add_trace(go.Scatter(
+                x=df_evolucao['mes'],
+                y=df_evolucao['gastos'],
+                mode='lines+markers',
+                line=dict(color='#e74c3c', width=3),
+                marker=dict(size=10, color='#c0392b'),
+                fill='tozeroy',
+                fillcolor='rgba(231, 76, 60, 0.1)',
+                text=[formatador.formatar_moeda(v) for v in df_evolucao['gastos']],
+                textposition='top center',
+                hovertemplate='<b>%{x}</b><br>Gastos: R$ %{y:,.2f}<extra></extra>'
+            ))
+            
+            fig_evolucao_gastos.update_layout(
+                title="Tendência de Gastos",
+                xaxis_title="Mês",
+                yaxis_title="Gastos (R$)",
+                height=400,
+                showlegend=False
+            )
+            
+            st.plotly_chart(fig_evolucao_gastos, use_container_width=True)
+        
+        with col2:
+            st.markdown("**Interpretação:**")
+            
+            # Calcula tendência
+            if len(df_evolucao) >= 2:
+                variacao = df_evolucao['gastos'].iloc[-1] - df_evolucao['gastos'].iloc[0]
+                variacao_percent = (variacao / df_evolucao['gastos'].iloc[0] * 100) if df_evolucao['gastos'].iloc[0] > 0 else 0
+                
+                if variacao > 0:
+                    st.error(f"""
+                    📈 **Tendência de Alta**
+                    
+                    Aumento de {formatador.formatar_moeda(variacao)} ({variacao_percent:+.1f}%)
+                    
+                    ⚠️ Atenção ao crescimento
+                    """)
+                elif variacao < 0:
+                    st.success(f"""
+                    📉 **Tendência de Queda**
+                    
+                    Redução de {formatador.formatar_moeda(abs(variacao))} ({variacao_percent:.1f}%)
+                    
+                    ✅ Controle melhorando
+                    """)
+                else:
+                    st.info("📊 **Gastos Estáveis**")
+                
+                # Média
+                media_gastos = df_evolucao['gastos'].mean()
+                st.metric("Média dos 6 meses", formatador.formatar_moeda(media_gastos))
+        
+        st.divider()
+        
+        # ===== KPI 3: Fluxo de Caixa Mensal =====
+        st.markdown("#### 💰 KPI 3: Fluxo de Caixa Mensal")
+        
+        fluxo_caixa = total_entradas_mes - total_despesas_mes
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            # Gráfico de Barras Comparativo
+            fig_fluxo = go.Figure()
+            
+            fig_fluxo.add_trace(go.Bar(
+                name='Entradas',
+                x=['Fluxo de Caixa'],
+                y=[total_entradas_mes],
+                marker_color='#27ae60',
+                text=[formatador.formatar_moeda(total_entradas_mes)],
+                textposition='inside',
+                hovertemplate='Entradas: R$ %{y:,.2f}<extra></extra>'
+            ))
+            
+            fig_fluxo.add_trace(go.Bar(
+                name='Saídas',
+                x=['Fluxo de Caixa'],
+                y=[total_despesas_mes],
+                marker_color='#e74c3c',
+                text=[formatador.formatar_moeda(total_despesas_mes)],
+                textposition='inside',
+                hovertemplate='Saídas: R$ %{y:,.2f}<extra></extra>'
+            ))
+            
+            # Adiciona linha do saldo
+            fig_fluxo.add_trace(go.Scatter(
+                name=f'Saldo: {formatador.formatar_moeda(fluxo_caixa)}',
+                x=['Fluxo de Caixa'],
+                y=[fluxo_caixa],
+                mode='markers+text',
+                marker=dict(
+                    size=20,
+                    color='#3498db',
+                    symbol='diamond'
+                ),
+                text=[formatador.formatar_moeda(fluxo_caixa)],
+                textposition='top center',
+                hovertemplate='Saldo: R$ %{y:,.2f}<extra></extra>'
+            ))
+            
+            fig_fluxo.update_layout(
+                title="Entradas vs Saídas",
+                yaxis_title="Valor (R$)",
+                height=400,
+                barmode='group'
+            )
+            
+            st.plotly_chart(fig_fluxo, use_container_width=True)
+        
+        with col2:
+            st.markdown("**Interpretação:**")
+            
+            if fluxo_caixa > 0:
+                st.success(f"""
+                ✅ **SUPERÁVIT**
+                
+                {formatador.formatar_moeda(fluxo_caixa)}
+                
+                Você gastou menos que recebeu!
+                """)
+            elif fluxo_caixa < 0:
+                st.error(f"""
+                ⚠️ **DÉFICIT**
+                
+                {formatador.formatar_moeda(fluxo_caixa)}
+                
+                Você gastou mais que recebeu!
+                """)
+            else:
+                st.info("⚖️ **EQUILÍBRIO**\n\nEntradas = Saídas")
+            
+            # Taxa de economia
+            if total_entradas_mes > 0:
+                taxa_economia = (fluxo_caixa / total_entradas_mes * 100)
+                st.metric("Taxa de Economia", f"{taxa_economia:.1f}%")
+        
+        st.divider()
+        
+        # ===== KPI 4: Percentual de Comprometimento da Renda =====
+        st.markdown("#### ⚠️ KPI 4: Comprometimento da Renda")
+        
+        if total_entradas_mes > 0:
+            comprometimento = (total_despesas_mes / total_entradas_mes * 100)
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                # Gauge (Velocímetro)
+                fig_gauge = go.Figure(go.Indicator(
+                    mode="gauge+number+delta",
+                    value=comprometimento,
+                    domain={'x': [0, 1], 'y': [0, 1]},
+                    title={'text': "Comprometimento (%)"},
+                    delta={'reference': 50, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
+                    gauge={
+                        'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
+                        'bar': {'color': "darkblue"},
+                        'bgcolor': "white",
+                        'borderwidth': 2,
+                        'bordercolor': "gray",
+                        'steps': [
+                            {'range': [0, 50], 'color': '#27ae60'},
+                            {'range': [50, 70], 'color': '#f39c12'},
+                            {'range': [70, 100], 'color': '#e74c3c'}
+                        ],
+                        'threshold': {
+                            'line': {'color': "red", 'width': 4},
+                            'thickness': 0.75,
+                            'value': 70
+                        }
+                    }
+                ))
+                
+                fig_gauge.update_layout(
+                    height=300,
+                    margin=dict(l=20, r=20, t=50, b=20)
+                )
+                
+                st.plotly_chart(fig_gauge, use_container_width=True)
+            
+            with col2:
+                st.markdown("**Interpretação:**")
+                
+                if comprometimento <= 50:
+                    st.success(f"""
+                    ✅ **SAUDÁVEL**
+                    
+                    {comprometimento:.1f}% da renda comprometida
+                    
+                    Excelente controle financeiro!
+                    """)
+                elif comprometimento <= 70:
+                    st.warning(f"""
+                    ⚠️ **ATENÇÃO**
+                    
+                    {comprometimento:.1f}% da renda comprometida
+                    
+                    Monitore seus gastos.
+                    """)
+                else:
+                    st.error(f"""
+                    🔴 **RISCO ALTO**
+                    
+                    {comprometimento:.1f}% da renda comprometida
+                    
+                    Reduza despesas urgente!
+                    """)
+                
+                st.markdown(f"""
+                **Referências:**
+                - 0-50%: Saudável 🟢
+                - 50-70%: Atenção 🟡
+                - 70-100%: Risco 🔴
+                """)
+        else:
+            st.info("⚠️ Sem entradas registradas neste período.")
+        
+        st.divider()
+        
+        # ===== KPI 5: Saldo Acumulado (Últimos 6 meses) =====
+        st.markdown("#### 📊 KPI 5: Saldo Acumulado")
+        
+        # Calcula saldo acumulado dos últimos 6 meses
+        saldos_acumulados = []
+        saldo_acumulado = 0
+        data_atual = date(ano, mes, 1)
+        
+        for i in range(5, -1, -1):
+            data_mes = data_atual - relativedelta(months=i)
+            mes_num = data_mes.month
+            ano_num = data_mes.year
+            
+            totais_mes = LancamentoService.calcular_totais(usuario.id, mes_num, ano_num)
+            saldo_acumulado += totais_mes['saldo']
+            
+            saldos_acumulados.append({
+                'mes': formatador.mes_ano_formatado(mes_num, ano_num).split(' de ')[0][:3],
+                'saldo_mensal': totais_mes['saldo'],
+                'saldo_acumulado': saldo_acumulado
+            })
+        
+        df_acumulado = pd.DataFrame(saldos_acumulados)
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            # Gráfico de Área
+            fig_acumulado = go.Figure()
+            
+            fig_acumulado.add_trace(go.Scatter(
+                x=df_acumulado['mes'],
+                y=df_acumulado['saldo_acumulado'],
+                mode='lines+markers',
+                line=dict(color='#3498db', width=3),
+                marker=dict(size=10),
+                fill='tozeroy',
+                fillcolor='rgba(52, 152, 219, 0.2)',
+                text=[formatador.formatar_moeda(v) for v in df_acumulado['saldo_acumulado']],
+                textposition='top center',
+                hovertemplate='<b>%{x}</b><br>Saldo Acumulado: R$ %{y:,.2f}<extra></extra>'
+            ))
+            
+            fig_acumulado.update_layout(
+                title="Evolução do Capital",
+                xaxis_title="Mês",
+                yaxis_title="Saldo Acumulado (R$)",
+                height=400,
+                showlegend=False
+            )
+            
+            # Linha zero
+            fig_acumulado.add_hline(y=0, line_dash="dash", line_color="gray", opacity=0.5)
+            
+            st.plotly_chart(fig_acumulado, use_container_width=True)
+        
+        with col2:
+            st.markdown("**Interpretação:**")
+            
+            saldo_inicial = df_acumulado['saldo_acumulado'].iloc[0]
+            saldo_final = df_acumulado['saldo_acumulado'].iloc[-1]
+            variacao_capital = saldo_final - saldo_inicial
+            
+            if variacao_capital > 0:
+                st.success(f"""
+                📈 **CRESCIMENTO**
+                
+                +{formatador.formatar_moeda(variacao_capital)}
+                
+                Capacidade de poupança!
+                """)
+            elif variacao_capital < 0:
+                st.error(f"""
+                📉 **QUEDA**
+                
+                {formatador.formatar_moeda(variacao_capital)}
+                
+                Consumo excessivo!
+                """)
+            else:
+                st.info("⚖️ **ESTÁVEL**")
+            
+            st.metric(
+                "Saldo Atual (6 meses)",
+                formatador.formatar_moeda(saldo_final)
+            )
+            
+            # Taxa de crescimento
+            if saldo_inicial != 0:
+                taxa_crescimento = (variacao_capital / abs(saldo_inicial) * 100)
+                st.metric("Crescimento", f"{taxa_crescimento:+.1f}%")
+    else:
+        st.info("📭 Nenhum lançamento registrado neste período. Cadastre entradas e despesas para visualizar os KPIs.")
+    
+    st.divider()
+    
     # ===== GRÁFICOS DO MÊS ATUAL =====
     st.subheader(f"📊 Detalhamento de {formatador.mes_ano_formatado(mes, ano)}")
     

@@ -13,7 +13,7 @@ from ui import (
 def configurar_pagina():
     """Configura as propriedades da página."""
     st.set_page_config(
-        page_title="Ricci - Sistema de Finanças Pessoais",
+        page_title="Sistema de Finanças Pessoais",
         page_icon="💰",
         layout="wide",
         initial_sidebar_state="expanded"

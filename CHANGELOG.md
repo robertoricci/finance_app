@@ -1,5 +1,216 @@
 # 🚀 CHANGELOG
 
+## ✨ Versão 1.5 - KPIs Financeiros Profissionais
+
+### 📊 5 Novos Indicadores na Visão Mensal
+
+Implementação de KPIs com rigor técnico financeiro e visualizações profissionais.
+
+#### KPI 1: Distribuição de Despesas por Categoria
+**Objetivo:** Identificar para onde o dinheiro está sendo direcionado
+
+**Fórmula:**
+```
+Percentual = (Despesas da Categoria / Total de Despesas) × 100
+```
+
+**Visualização:** Gráfico de Donut
+- Centro mostra total de despesas
+- Cada fatia colorida por categoria
+- Percentual e valor em cada fatia
+- Cores das próprias categorias cadastradas
+
+**Interpretação:**
+- ✅ TOP 3 categorias exibidas ao lado
+- ⚠️ Alerta se alguma categoria > 40% dos gastos
+- 💡 Identifica categorias de maior impacto
+
+---
+
+#### KPI 2: Evolução Mensal de Gastos
+**Objetivo:** Analisar tendência dos gastos ao longo do tempo
+
+**Fórmula:**
+```
+Gastos Mensais = Σ(Despesas) agrupado por mês
+```
+
+**Visualização:** Gráfico de Linha com Área Preenchida
+- Linha vermelha com marcadores
+- Área preenchida semitransparente
+- Últimos 6 meses de dados
+- Valores em cada ponto
+
+**Interpretação:**
+- 📈 Tendência de alta = Perda de controle
+- 📉 Tendência de queda = Controle melhorando
+- 📊 Média dos 6 meses calculada
+- 💰 Variação percentual vs início do período
+
+---
+
+#### KPI 3: Fluxo de Caixa Mensal
+**Objetivo:** Comparar entradas e saídas no mesmo período
+
+**Fórmula:**
+```
+Fluxo de Caixa = Σ(Entradas) - Σ(Saídas)
+```
+
+**Visualização:** Barras Agrupadas + Marcador de Saldo
+- Barra verde: Entradas
+- Barra vermelha: Saídas
+- Diamante azul: Saldo resultante
+- Valores dentro das barras
+
+**Interpretação:**
+- ✅ Superávit: Gastou menos que recebeu
+- ⚠️ Déficit: Gastou mais que recebeu
+- ⚖️ Equilíbrio: Entradas = Saídas
+- 📊 Taxa de economia calculada
+
+---
+
+#### KPI 4: Percentual de Comprometimento da Renda
+**Objetivo:** Avaliar quanto da renda está comprometida com despesas
+
+**Fórmula:**
+```
+Comprometimento (%) = (Σ Saídas / Σ Entradas) × 100
+```
+
+**Visualização:** Gauge (Velocímetro)
+- Faixas coloridas:
+  - 0-50%: Verde (Saudável)
+  - 50-70%: Amarelo (Atenção)
+  - 70-100%: Vermelho (Risco)
+- Ponteiro indica valor atual
+- Delta vs referência de 50%
+
+**Interpretação:**
+- ✅ 0-50%: Saudável - Excelente controle
+- ⚠️ 50-70%: Atenção - Monitore os gastos
+- 🔴 70-100%: Risco Alto - Reduza despesas urgente
+
+---
+
+#### KPI 5: Saldo Acumulado
+**Objetivo:** Acompanhar evolução do capital ao longo do tempo
+
+**Fórmula:**
+```
+Saldo Acumulado(t) = Σ(Entradas até t) - Σ(Saídas até t)
+```
+
+**Visualização:** Gráfico de Área
+- Linha azul com área preenchida
+- Últimos 6 meses acumulados
+- Linha zero como referência
+- Valores em cada mês
+
+**Interpretação:**
+- 📈 Crescimento: Capacidade de poupança
+- 📉 Queda: Consumo excessivo
+- 📊 Taxa de crescimento do período
+- 💰 Saldo atual (acumulado 6 meses)
+
+---
+
+### 📋 Localização dos KPIs
+
+**Dashboard → Visão Mensal**
+
+Seção nova: "📊 Indicadores Financeiros Profissionais"
+
+Ordem de exibição:
+1. KPI 1: Distribuição de Despesas
+2. KPI 2: Evolução Mensal
+3. KPI 3: Fluxo de Caixa
+4. KPI 4: Comprometimento da Renda
+5. KPI 5: Saldo Acumulado
+
+Cada KPI tem:
+- ✅ Título e objetivo claro
+- ✅ Gráfico profissional
+- ✅ Painel de interpretação
+- ✅ Métricas complementares
+- ✅ Alertas quando aplicável
+
+---
+
+### 💡 Benefícios dos KPIs
+
+#### Para Usuários Leigos
+- 📊 Visualizações simples e intuitivas
+- 🎨 Sistema de cores (verde/amarelo/vermelho)
+- 📝 Interpretação em linguagem clara
+- ⚠️ Alertas automáticos
+
+#### Para Usuários Avançados
+- 📈 Análise de tendências
+- 💰 Métricas financeiras profissionais
+- 📊 Comparativos temporais
+- 🎯 Benchmarks de referência
+
+#### Para Planejamento
+- 🔍 Identifica problemas rapidamente
+- 📉 Mostra evolução ao longo do tempo
+- 🎯 Estabelece metas claras
+- 💡 Sugere áreas de melhoria
+
+---
+
+### 🎯 Casos de Uso
+
+#### Cenário 1: Análise de Gastos
+```
+KPI 1 mostra: Alimentação = 45%
+→ ALERTA! Categoria muito alta
+→ Ação: Revisar gastos com alimentação
+```
+
+#### Cenário 2: Controle de Tendência
+```
+KPI 2 mostra: Aumento de 15% nos últimos 6 meses
+→ ATENÇÃO! Gastos crescendo
+→ Ação: Implementar controle mais rígido
+```
+
+#### Cenário 3: Saúde Financeira
+```
+KPI 4 mostra: 35% de comprometimento
+→ SAUDÁVEL! Zona verde
+→ Ação: Manter o controle atual
+```
+
+---
+
+### ✅ Especificações Técnicas
+
+**Campos do Banco Utilizados:**
+- `valor` ✅
+- `tipo` (entrada/saída) ✅
+- `categoria` ✅
+- `data` ✅
+
+**Cálculos Implementados:**
+- Agregações por categoria ✅
+- Agrupamento temporal ✅
+- Cálculos acumulativos ✅
+- Percentuais e taxas ✅
+
+**Filtros Aplicáveis:**
+- Por mês específico ✅
+- Por ano específico ✅
+- Últimos 6 meses ✅
+
+**Performance:**
+- Queries otimizadas ✅
+- Cache de dados ✅
+- Renderização eficiente ✅
+
+---
+
 ## ✨ Versão 1.4 - Gráficos de Controle Financeiro
 
 ### 🎯 Novos Gráficos de Análise
