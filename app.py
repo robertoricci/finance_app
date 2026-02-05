@@ -38,7 +38,7 @@ def criar_sidebar():
     usuario = st.session_state['usuario']
     
     with st.sidebar:
-        st.image("https://via.placeholder.com/150x50/3498db/ffffff?text=Finanças", use_container_width=True)
+        ###st.image("https://via.placeholder.com/150x50/3498db/ffffff?text=Finanças", use_container_width=True)
         
         st.markdown(f"### Olá, {usuario.nome.split()[0]}! 👋")
         st.markdown(f"📧 {usuario.email}")
