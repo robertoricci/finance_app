@@ -4,6 +4,7 @@ from .categorias import mostrar_categorias
 from .lancamentos import mostrar_lancamentos
 from .planejamento import mostrar_planejamento
 from .relatorios import mostrar_relatorios
+from .acompanhamento_orcamento import mostrar_acompanhamento_orcamento
 
 __all__ = [
     'mostrar_tela_autenticacao',
@@ -11,5 +12,6 @@ __all__ = [
     'mostrar_categorias',
     'mostrar_lancamentos',
     'mostrar_planejamento',
-    'mostrar_relatorios'
+    'mostrar_relatorios',
+    'mostrar_acompanhamento_orcamento'
 ]

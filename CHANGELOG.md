@@ -1,5 +1,281 @@
 # 🚀 CHANGELOG
 
+## ✨ Versão 1.6 - Acompanhamento de Orçamento Não Utilizado
+
+### 💰 Nova Tela: Visualização de Saldo Disponível
+
+Implementação de uma visão completa para acompanhar o orçamento planejado vs utilizado, mostrando claramente o que ainda está disponível.
+
+#### 🎯 Objetivo
+Responder às perguntas:
+- "Quanto do meu orçamento eu já usei?"
+- "Quanto ainda tenho disponível para gastar?"
+- "Quais categorias ainda têm saldo?"
+- "Em quais meses economizei mais?"
+
+---
+
+### 📊 Funcionalidades Implementadas
+
+#### 1️⃣ Resumo Anual
+
+**4 KPIs Principais:**
+- 💰 Total Planejado (ano)
+- 💸 Total Utilizado (ano)
+- 💵 Total Disponível (ano)
+- 📊 % Utilizado (ano)
+
+**Análise Automática:**
+- ✅ Quantos meses com saldo disponível
+- ⚠️ Quantos meses estouraram
+- 💡 Quantos meses sem orçamento
+
+---
+
+#### 2️⃣ Gráfico: Disponível vs Utilizado
+
+**Tipo:** Barras Empilhadas por Mês
+
+**Visualização:**
+- 🔴 Parte inferior: Utilizado
+- 🟢 Parte superior: Disponível
+- 📊 Altura total = Orçamento planejado
+
+**Interpretação Visual:**
+- Barra toda vermelha = Gastou tudo
+- Barra com muito verde = Muita economia
+- Barra maior que planejado = Estourou
+
+---
+
+#### 3️⃣ Detalhamento Mês a Mês (12 Abas)
+
+**Para cada mês:**
+
+**KPIs do Mês:**
+- Planejado
+- Utilizado (com % do total)
+- Disponível (com indicador de cor)
+- Barra de progresso visual
+
+**Gráfico de Barras Horizontais:**
+- Barra azul clara: Orçamento planejado (fundo)
+- Barra colorida: Valor utilizado (frente)
+  - 🟢 Verde: Dentro do orçamento
+  - 🔴 Vermelho: Estourou o orçamento
+
+**Tabela Detalhada por Categoria:**
+- Categoria
+- Planejado
+- Utilizado
+- Disponível
+- % Usado
+- Status (🟢 Disponível / 🔴 Estourou / ⚖️ Exato)
+
+**Alertas Inteligentes:**
+- ⚠️ Lista categorias que estouraram
+- ✅ Mostra saldo disponível total
+- 💰 Top 3 categorias com maior saldo
+
+---
+
+#### 4️⃣ Insights e Recomendações
+
+**Melhores Meses:**
+- Top 3 meses com mais saldo disponível
+- Valores e percentuais
+
+**Meses de Atenção:**
+- Top 3 meses que estouraram
+- Ou que usaram quase tudo (>95%)
+
+**Recomendações Automáticas:**
+
+**Se tem saldo positivo:**
+- ✅ Parabeniza pelo controle
+- 💡 Sugere investir o excedente
+- 📊 Mostra percentual economizado
+
+**Se estourou:**
+- ⚠️ Alerta sobre o estouro
+- 📝 Lista ações recomendadas
+- 🎯 Sugere revisão de categorias
+
+---
+
+### 📍 Como Acessar
+
+**Menu Lateral → 💰 Acompanhamento**
+
+Localização no sistema:
+1. Faça login
+2. No menu lateral, clique em "💰 Acompanhamento"
+3. Selecione o ano
+4. Visualize:
+   - Resumo anual
+   - Gráfico consolidado
+   - Abas mês a mês (12 meses)
+   - Insights e recomendações
+
+---
+
+### 🎨 Características Visuais
+
+**Sistema de Cores:**
+- 🟢 Verde: Saldo disponível / Dentro do orçamento
+- 🔴 Vermelho: Utilizado / Estourou orçamento
+- 🔵 Azul: Planejado (fundo)
+- 🟡 Amarelo: Alertas gerais
+
+**Elementos Interativos:**
+- Tabs para cada mês
+- Gráficos com hover detalhado
+- Tabelas com scroll
+- Expandir/colapsar seções
+
+**Formatação:**
+- Todos os valores em R$
+- Percentuais com 1 casa decimal
+- Barras de progresso visuais
+- Status com emojis
+
+---
+
+### 💡 Casos de Uso
+
+#### Cenário 1: Planejamento de Gastos
+```
+Situação: É dia 15 e você quer saber quanto ainda pode gastar
+
+Ação:
+1. Acessar "Acompanhamento"
+2. Ir na aba do mês atual
+3. Ver "Disponível" por categoria
+
+Resultado:
+"Alimentação: R$ 400 disponíveis
+Lazer: R$ 150 disponíveis"
+→ Pode gastar até esses valores
+```
+
+#### Cenário 2: Identificar Economia
+```
+Situação: Quer saber em quais meses economizou
+
+Ação:
+1. Ver seção "Melhores Meses"
+2. Identificar top 3
+
+Resultado:
+"Junho: R$ 800 disponíveis
+Maio: R$ 650 disponíveis
+Março: R$ 500 disponíveis"
+→ Padrão de economia identificado
+```
+
+#### Cenário 3: Revisar Categoria Problemática
+```
+Situação: Sempre estoura "Alimentação"
+
+Ação:
+1. Ver detalhamento mês a mês
+2. Verificar categoria em cada mês
+
+Resultado:
+"Jan: Estourou R$ 200
+Fev: Estourou R$ 150
+Mar: Estourou R$ 300"
+→ Precisa ajustar orçamento desta categoria
+```
+
+#### Cenário 4: Realocação de Orçamento
+```
+Situação: Tem saldo em uma categoria, precisa em outra
+
+Ação:
+1. Ver "Top 3 categorias com maior saldo"
+2. Identificar onde tem sobra
+
+Resultado:
+"Lazer: R$ 300 não utilizados
+Saúde: R$ 200 não utilizados"
+→ Pode realocar ou economizar para próximo mês
+```
+
+---
+
+### 🎯 Benefícios
+
+**Controle Financeiro:**
+- ✅ Visão clara do que ainda pode gastar
+- ✅ Evita estourar orçamento
+- ✅ Identifica categorias problemáticas
+
+**Planejamento:**
+- 📊 Histórico completo do ano
+- 📈 Padrões de consumo identificados
+- 🎯 Metas de economia acompanhadas
+
+**Tomada de Decisão:**
+- 💡 Insights automáticos
+- ⚠️ Alertas proativos
+- 📝 Recomendações práticas
+
+**Transparência:**
+- 👁️ Tudo visível e claro
+- 📊 Múltiplas visualizações
+- 📋 Dados detalhados
+
+---
+
+### 📊 Integração com Sistema
+
+**Dados Utilizados:**
+- Orçamentos (tabela `orcamentos_mensais`)
+- Lançamentos (tabela `lancamentos`)
+- Categorias (tabela `categorias`)
+
+**Cálculos:**
+```
+Disponível = Planejado - Utilizado
+% Utilizado = (Utilizado / Planejado) × 100
+Status = "Disponível" se Disponível > 0 else "Estourou"
+```
+
+**Atualizações:**
+- Em tempo real
+- Baseado nos lançamentos mais recentes
+- Sincronizado com dashboard e planejamento
+
+---
+
+### ✅ Checklist de Uso
+
+- [ ] Defini orçamento para todos os meses?
+- [ ] Verifiquei o resumo anual?
+- [ ] Identifiquei meses com saldo?
+- [ ] Revisei categorias que estouraram?
+- [ ] Li as recomendações automáticas?
+- [ ] Ajustei orçamento conforme necessário?
+
+---
+
+### 🆕 Diferenciais
+
+**Antes:**
+- Precisava calcular manualmente o disponível
+- Não sabia quanto podia gastar
+- Difícil identificar padrões
+
+**Agora:**
+- ✅ Cálculo automático do disponível
+- ✅ Visualização clara por mês e categoria
+- ✅ Insights e alertas automáticos
+- ✅ 12 meses em uma tela
+- ✅ Recomendações personalizadas
+
+---
+
 ## ✨ Versão 1.5 - KPIs Financeiros Profissionais
 
 ### 📊 5 Novos Indicadores na Visão Mensal

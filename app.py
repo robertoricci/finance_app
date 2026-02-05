@@ -6,7 +6,8 @@ from ui import (
     mostrar_categorias,
     mostrar_lancamentos,
     mostrar_planejamento,
-    mostrar_relatorios
+    mostrar_relatorios,
+    mostrar_acompanhamento_orcamento
 )
 
 
@@ -50,6 +51,7 @@ def criar_sidebar():
             "🏷️ Categorias": "categorias",
             "💳 Lançamentos": "lancamentos",
             "📋 Planejamento": "planejamento",
+            "💰 Acompanhamento": "acompanhamento",
             "📄 Relatórios": "relatorios"
         }
         
@@ -117,6 +119,8 @@ def main():
             mostrar_lancamentos()
         elif pagina_atual == 'planejamento':
             mostrar_planejamento()
+        elif pagina_atual == 'acompanhamento':
+            mostrar_acompanhamento_orcamento()
         elif pagina_atual == 'relatorios':
             mostrar_relatorios()
 
